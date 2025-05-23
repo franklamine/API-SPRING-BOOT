@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 public class CustomExceptionHandler {
 
     // Capture les exceptions spécifiques de type EtudiantNotFoundException
-    @ExceptionHandler(EtudiantNotFoundException.class)
-    public ResponseEntity<ApiError> handleEtudiantNotFoundException(EtudiantNotFoundException e) {
+    @ExceptionHandler(UtilisateurNotFoundException.class)
+    public ResponseEntity<ApiError> handleEtudiantNotFoundException(UtilisateurNotFoundException e) {
         ApiError apiError = new ApiError();
         apiError.setMessage(e.getMessage()); // Message personnalisé de l'exception
         apiError.setCode(HttpStatus.NOT_FOUND.value()); // Code HTTP 404

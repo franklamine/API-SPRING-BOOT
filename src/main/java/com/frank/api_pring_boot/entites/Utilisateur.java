@@ -1,6 +1,5 @@
 package com.frank.api_pring_boot.entites;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,22 +14,24 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "etudiants")
-public class Etudiant {
+@Table(name = "utilisateurs")
+public class Utilisateur {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nom;
     private String prenom;
+    private String role;
 
     @Column(unique = true)
     private String email;
-    private int age;
+    private String motDePasse;
+    private String motDePasseConfirmation;
 
     //    @OneToMany(mappedBy = "etudiant", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OneToMany(mappedBy = "etudiant", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "utilisateur", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
 //    @JsonIgnore // Ignore l'attribut commentaires
     @JsonManagedReference  // Sérialise les commentaires associés à l'Etudiant
-    List<Commentaire> commentaireList;
+    List<Publication> publicationList;
 
 }
