@@ -12,7 +12,6 @@ import java.util.List;
 @RequestMapping(path = "utilisateurs") // Route de base pour tous les endpoints de cette classe
 public class UtilisateurControler {
 
-    // Service injecté pour accéder à la logique métier
     private UtilisateurService utilisateurService;
 
     // Injection via constructeur (bonne pratique pour faciliter les tests)
@@ -20,18 +19,16 @@ public class UtilisateurControler {
         this.utilisateurService = etudiantService;
     }
 
-    // Inscrire un nouvel utilisateur
     @ResponseStatus(value = HttpStatus.CREATED) // Indique que l'opération retourne un code 201
     @PostMapping(path = "inscription")
-    public ResponseEntity<String> inscrireUtilisateur(@RequestBody Utilisateur utilisateur) {
-        return utilisateurService.inscrireUtilisateur(utilisateur);
+    public ResponseEntity<String> inscription(@RequestBody Utilisateur utilisateur) {
+        return utilisateurService.inscription(utilisateur);
     }
 
-    // Connecter un nouvel utilisateur
     @ResponseStatus(value = HttpStatus.CREATED) // Indique que l'opération retourne un code 201
     @PostMapping(path = "connexion")
-    public ResponseEntity<?> connecterUtilisateur(@RequestBody Utilisateur utilisateur) {
-        return utilisateurService.connecterUtilisateur(utilisateur);
+    public ResponseEntity<?> connexion(@RequestBody Utilisateur utilisateur) {
+        return utilisateurService.connexion(utilisateur);
     }
 
     // Récupérer la liste de tous les utilisateurs

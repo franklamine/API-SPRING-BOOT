@@ -1,5 +1,6 @@
 package com.frank.api_pring_boot.services;
 
+import com.frank.api_pring_boot.configuration.JwtUtils;
 import com.frank.api_pring_boot.entites.Utilisateur;
 import com.frank.api_pring_boot.exceptions.UtilisateurNotFoundException;
 import com.frank.api_pring_boot.repository.IUtilisateurRepository;
@@ -8,26 +9,27 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UtilisateurService {
 
-    // Injection du repository pour interagir avec la base de données
     private final IUtilisateurRepository utilisateurRepository;
-    // Injecte l'encodeur de mots de passe (BCrypt)
     private final PasswordEncoder passwordEncoder;
-    // Injecte le gestionnaire d'authentification (utilisé pour vérifier les identifiants)
     private final AuthenticationManager authenticationManager;
+    private final JwtUtils jwtUtils;
 
 
     // Inscrire un nouvel utilisateur
-    public ResponseEntity<String> inscrireUtilisateur(Utilisateur utilisateur) {
+    public ResponseEntity<String> inscription(Utilisateur utilisateur) {
         Utilisateur utilisateurRechercher = utilisateurRepository.findByEmail(utilisateur.getEmail());
 
         // Vérifie si l'email existe déjà
@@ -43,19 +45,20 @@ public class UtilisateurService {
     }
 
     // Connecter un utilisateur
-    public ResponseEntity<?> connecterUtilisateur(Utilisateur utilisateur) {
+    public ResponseEntity<?> connexion(Utilisateur utilisateur) {
         try {
             // Vérifie les identifiants avec le gestionnaire d'authentification
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(utilisateur.getEmail(), utilisateur.getMotDePasse())
-            );
-            // Si les identifiants sont corrects, on retourne 200 OK
-            return ResponseEntity.ok("Utilisateur connecté ");
-
+           Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(utilisateur.getEmail(), utilisateur.getMotDePasse()));
+            if(authentication.isAuthenticated()) {
+                Map<String, Object> authData = new HashMap<>();
+                authData.put("token", jwtUtils.generateToken(utilisateur.getEmail()));
+                authData.put("type", "Bearer");
+                return ResponseEntity.ok(authData);
+            }
+          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
-            // Si l’authentification échoue, on retourne une erreur 401 (non autorisé)
-            throw new UtilisateurNotFoundException("L'email ou mot de passe incorrect");
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email ou mot de passe incorrect");
+            throw new RuntimeException(e);
+//            throw new UtilisateurNotFoundException("L'email ou mot de passe incorrect");
         }
     }
 
